@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="TSDFMerge">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="PointToPlaneICP">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Sensor">
+      <UniqueIdentifier>{76488480-741e-4ef3-b14c-53755702a243}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TSDFMerge\Volume">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="TSDFMerge\Model">
+      <UniqueIdentifier>{7a7bb11f-a0a4-495e-8e6a-fb864bbb2d15}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="kf_main.h" />
+    <ClInclude Include="kf_util.h" />
+    <ClInclude Include="CUDARGBDSensor.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBDSensor.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorData.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorParam.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="SensorUtil.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_SimpleMatrixUtil.h">
+      <Filter>TSDFMerge</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_Util.h">
+      <Filter>TSDFMerge</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDATSDFMerger.h">
+      <Filter>TSDFMerge</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PointToPlaneICP\Eigen.h">
+      <Filter>PointToPlaneICP</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PointToPlaneICP\LinearSystem.h">
+      <Filter>PointToPlaneICP</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PointToPlaneICP\LinearSystemConfidence.h">
+      <Filter>PointToPlaneICP</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PointToPlaneICP\PointToPlaneICP.h">
+      <Filter>PointToPlaneICP</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PointToPlaneICP\PointToPlaneICP_Data.h">
+      <Filter>PointToPlaneICP</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PointToPlaneICP\PointToPlaneICP_Params.h">
+      <Filter>PointToPlaneICP</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterParam.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+    <ClInclude Include="TSDFUpdate.h">
+      <Filter>TSDFMerge</Filter>
+    </ClInclude>
+    <ClInclude Include="TSDFRaycast.h">
+      <Filter>TSDFMerge</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeParam.h">
+      <Filter>TSDFMerge\Volume</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeData.h">
+      <Filter>TSDFMerge\Volume</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelData.h">
+      <Filter>TSDFMerge\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CUDASensorData.h">
+      <Filter>Sensor</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="kf_main.cpp" />
+    <ClCompile Include="CUDARGBDSensor.cpp">
+      <Filter>Sensor</Filter>
+    </ClCompile>
+    <ClCompile Include="RGBDSensor.cpp">
+      <Filter>Sensor</Filter>
+    </ClCompile>
+    <ClCompile Include="CUDATSDFMerger.cpp">
+      <Filter>TSDFMerge</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PointToPlaneICP\LinearSystem.cpp">
+      <Filter>PointToPlaneICP</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PointToPlaneICP\PointToPlaneICP.cpp">
+      <Filter>PointToPlaneICP</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="SensorUtil.cu">
+      <Filter>Sensor</Filter>
+    </CudaCompile>
+    <CudaCompile Include="src\PointToPlaneICP\LinearSystem_Kernel.cu">
+      <Filter>PointToPlaneICP</Filter>
+    </CudaCompile>
+    <CudaCompile Include="src\PointToPlaneICP\PointToPlaneICP_Kernel.cu">
+      <Filter>PointToPlaneICP</Filter>
+    </CudaCompile>
+    <CudaCompile Include="TSDFUpdate.cu">
+      <Filter>TSDFMerge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="TSDFRaycast.cu">
+      <Filter>TSDFMerge</Filter>
+    </CudaCompile>
+    <CudaCompile Include="VolumeDataUtil.cu">
+      <Filter>TSDFMerge\Volume</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

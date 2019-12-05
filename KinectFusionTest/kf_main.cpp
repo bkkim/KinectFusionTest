@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 	float4x4 transform;
 	transform.setIdentity();
 
-	std::string data_path("../Dataset/Kinect1/ubody360/source");
+	std::string data_path("../Dataset/Kinect1/ubody180/source");
 	char depth_file[MAX_PATH] = {0,};
 	char color_file[MAX_PATH] = {0,};
 

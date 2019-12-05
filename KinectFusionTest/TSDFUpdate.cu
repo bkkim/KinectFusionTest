@@ -34,12 +34,15 @@ namespace tsdf
 				s_idx.x = (idx % (voxel_dim.x * voxel_dim.y)) % voxel_dim.x;
 
 				float3 vertex;
-				vertex.x = voxel_origin.x + s_idx.x * voxel_size;
-				vertex.y = voxel_origin.y + s_idx.y * voxel_size;
-				vertex.z = voxel_origin.z + s_idx.z * voxel_size;
+				vertex.x = voxel_origin.x + ((static_cast<float>(s_idx.x) + 0.5f) * voxel_size);
+				vertex.y = voxel_origin.y + ((static_cast<float>(s_idx.y) + 0.5f) * voxel_size);
+				vertex.z = voxel_origin.z + ((static_cast<float>(s_idx.z) + 0.5f) * voxel_size);
 
 				// Convert world coordinates to camera coordinates
 				float3 cam_space = extrinsic * vertex;
+				if (cam_space.z <= 0)
+					return;
+
 				float3 img_coord = intrinsic * cam_space;
 				uint u = roundf(img_coord.x / img_coord.z);
 				uint v = roundf(img_coord.y / img_coord.z);

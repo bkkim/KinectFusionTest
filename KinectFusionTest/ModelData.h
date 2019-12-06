@@ -23,6 +23,7 @@ private:
 		cudaMalloc(&d_raycast_depth,  sizeof(float )*size);
 		cudaMalloc(&d_raycast_vertex, sizeof(float4)*size);
 		cudaMalloc(&d_raycast_normal, sizeof(float4)*size);
+		cudaMalloc(&d_raycast_color,  sizeof(uchar4)*size);
 	}
 
 	void destroy()
@@ -30,6 +31,7 @@ private:
 		cudaFree(d_raycast_depth);
 		cudaFree(d_raycast_vertex);
 		cudaFree(d_raycast_normal);
+		cudaFree(d_raycast_color);
 	}
 
 public:
@@ -37,4 +39,5 @@ public:
 	float  *d_raycast_depth;
 	float4 *d_raycast_vertex;
 	float4 *d_raycast_normal;
+	uchar4 *d_raycast_color;
 };

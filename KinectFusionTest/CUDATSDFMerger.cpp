@@ -44,7 +44,7 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4* transform)
 
 	////////////////////////////////////
 	// Make ModelData from TSDF Volume.
-	tsdf::cuda::depth_raycast(
+	tsdf::cuda::raycast(
 		m_sensorParam.intrinsic, 
 		*transform,
 		m_sensorParam.width, 
@@ -55,7 +55,10 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4* transform)
 		m_volumeParam.trunc_margin,
 		m_volumeData->d_tsdf, 
 		m_volumeData->d_tsdf_weight,
-		m_modelData->d_raycast_depth);
+		m_modelData->d_raycast_depth,
+		m_modelData->d_raycast_vertex,
+		m_modelData->d_raycast_normal,
+		m_modelData->d_raycast_color);
 	
 	util::cuda::convert_depth2vertex(
 		m_modelData->d_raycast_vertex, 

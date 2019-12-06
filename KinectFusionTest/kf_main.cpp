@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
 	int idx_start = 900;
 	int frame_count = 600;
 
-	float4x4 transform;
-	transform.setIdentity();
+	float4x4 current_pose;
+	current_pose.setIdentity();
 
 	std::string data_path("../Dataset/Kinect1/ubody180/source");
 	char depth_file[MAX_PATH] = {0,};
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 		g_CUDARGBDSensor->process((uchar3*)color.data, (ushort*)depth.data);
 
 		if (bFirst) {
-			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, &transform);
+			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, &current_pose);
 			bFirst = false;
 		}
 		else {
@@ -123,17 +123,18 @@ int main(int argc, char* argv[])
 			float4* model_vertex = g_CUDATSDFMerger->getModelData()->d_raycast_vertex;
 			float4* model_normal = g_CUDATSDFMerger->getModelData()->d_raycast_normal;
 
-			float4x4 delta_transform = g_PointToPlaneICP->process(model_vertex, model_normal, frame_vertex, frame_normal);
+			// Frame to Model transform
+			float4x4 delta_transform = g_PointToPlaneICP->process(frame_vertex, frame_normal, model_vertex, model_normal);
 			if (delta_transform(0, 0) == -std::numeric_limits<float>::infinity()) {
 				std::cout << "Fail ICP." << std::endl;
 				continue;
 			}
 
 			// Set new transform.
-			transform = transform * delta_transform;
+			current_pose = current_pose * delta_transform.getInverse();
 			
 			// TSDF update and raycast 
-			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, &transform);
+			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, &current_pose);
 
 			//SaveData(frame_vertex, model_vertex, transform, param.width, param.height);
 

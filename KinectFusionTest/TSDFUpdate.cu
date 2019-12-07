@@ -10,7 +10,7 @@ namespace tsdf
 		__global__ 
 		void tsdf_update_kernel(
 			float4x4 intrinsic, 
-			float4x4 extrinsic,
+			float4x4 inv_extrinsic,
 			uint     width, 
 			uint     height, 
 			float    *img_depth,    // [IN]
@@ -39,7 +39,7 @@ namespace tsdf
 				vertex.z = voxel_origin.z + ((static_cast<float>(s_idx.z) + 0.5f) * voxel_size);
 
 				// Convert world coordinates to camera coordinates
-				float3 cam_space = extrinsic * vertex;
+				float3 cam_space = inv_extrinsic * vertex;
 				if (cam_space.z <= 0)
 					return;
 
@@ -74,7 +74,7 @@ namespace tsdf
 
 		void update(
 			float4x4 intrinsic, 
-			float4x4 extrinsic,
+			float4x4 inv_extrinsic,
 			uint     width, 
 			uint     height, 
 			float    *img_depth, 
@@ -94,7 +94,7 @@ namespace tsdf
 
 			tsdf_update_kernel <<< grid, block >>> (
 				intrinsic, 
-				extrinsic,
+				inv_extrinsic,
 				width, 
 				height, 
 				img_depth, 

@@ -49,7 +49,7 @@ namespace tsdf {
 				float3 pt_cam = intrinsic.getInverse() * make_float3(x, y, 1) *curr_z;
 
 				// Camera to world
-				float3 pt_wld = extrinsic.getInverse() * pt_cam;
+				float3 pt_wld = extrinsic * pt_cam;
 
 
 				// Find the 8-voxels' indices around the current ray

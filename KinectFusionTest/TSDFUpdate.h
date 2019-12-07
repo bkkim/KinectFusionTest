@@ -8,7 +8,7 @@ namespace tsdf
 	namespace cuda 
 	{
 		void update(float4x4 intrinsic,
-					float4x4 extrinsic,
+					float4x4 inv_extrinsic,
 					uint     width,
 					uint     height,
 					float    *img_depth,

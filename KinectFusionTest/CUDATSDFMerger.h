@@ -12,7 +12,7 @@ public:
 	CUDATSDFMerger(VolumeParam volumeParam, SensorParam sensorParam);
 	~CUDATSDFMerger();
 
-	void process(CUDARGBDSensor& sensor, float4x4* transform=NULL);
+	void process(CUDARGBDSensor& sensor, float4x4& current_pose);
 
 	VolumeParam getVolumeParam() {
 		return m_volumeParam;

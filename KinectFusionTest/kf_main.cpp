@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 			float4* model_vertex = g_CUDATSDFMerger->getModelData()->d_raycast_vertex;
 			float4* model_normal = g_CUDATSDFMerger->getModelData()->d_raycast_normal;
 
-			// Frame to Model transform
+			// Frame to Model transform => Model to Frame transformation
 			float4x4 delta_transform = g_PointToPlaneICP->process(frame_vertex, frame_normal, model_vertex, model_normal);
 			if (delta_transform(0, 0) == -std::numeric_limits<float>::infinity()) {
 				std::cout << "Fail ICP." << std::endl;
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 			}
 
 			// Set new transform.
-			current_pose = current_pose * delta_transform.getInverse();
+			current_pose = current_pose * delta_transform;
 			
 			// TSDF update and raycast 
 			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, &current_pose);

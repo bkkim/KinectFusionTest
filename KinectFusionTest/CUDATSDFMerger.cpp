@@ -28,7 +28,7 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4* transform)
 	// Update TSDF
 	tsdf::cuda::update(
 		m_sensorParam.intrinsic, 
-		*transform,
+		transform->getInverse(),
 		m_sensorParam.width, 
 		m_sensorParam.height,
 		cudaSensorData->d_depth_foreground,

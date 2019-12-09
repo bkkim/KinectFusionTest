@@ -21,14 +21,14 @@ CUDATSDFMerger::~CUDATSDFMerger()
 	SAFE_DELETE(m_modelData);
 }
 
-void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4* transform)
+void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4& current_pose)
 {
 	CUDASensorData *cudaSensorData = sensor.getCUDASensorData();
 	
 	// Update TSDF
 	tsdf::cuda::update(
 		m_sensorParam.intrinsic, 
-		transform->getInverse(),
+		current_pose.getInverse(),
 		m_sensorParam.width, 
 		m_sensorParam.height,
 		cudaSensorData->d_depth_foreground,
@@ -46,7 +46,7 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4* transform)
 	// Make ModelData from TSDF Volume.
 	tsdf::cuda::raycast(
 		m_sensorParam.intrinsic, 
-		*transform,
+		current_pose,
 		m_sensorParam.width, 
 		m_sensorParam.height,
 		m_volumeParam.voxel_origin, 

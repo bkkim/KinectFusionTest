@@ -15,8 +15,8 @@ namespace tsdf
 			uint     height, 
 			float    *img_depth,    // [IN]
 			uchar3   *img_color,    // [IN]
-			uint3    voxel_dim, 
-			float3   voxel_origin, 
+			uint3    volume_dim, 
+			float3   volume_origin, 
 			float    voxel_size, 
 			float    trunc_margin,
 			float    *tsdf,         // [OUT]
@@ -26,17 +26,17 @@ namespace tsdf
 		{
 			const int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-			if (idx < voxel_dim.x * voxel_dim.y * voxel_dim.z)
+			if (idx < volume_dim.x * volume_dim.y * volume_dim.z)
 			{
 				uint3 s_idx;
-				s_idx.z = (idx / (voxel_dim.x * voxel_dim.y));
-				s_idx.y = (idx % (voxel_dim.x * voxel_dim.y)) / voxel_dim.x;
-				s_idx.x = (idx % (voxel_dim.x * voxel_dim.y)) % voxel_dim.x;
+				s_idx.z = (idx / (volume_dim.x * volume_dim.y));
+				s_idx.y = (idx % (volume_dim.x * volume_dim.y)) / volume_dim.x;
+				s_idx.x = (idx % (volume_dim.x * volume_dim.y)) % volume_dim.x;
 
 				float3 vertex;
-				vertex.x = voxel_origin.x + ((static_cast<float>(s_idx.x) + 0.5f) * voxel_size);
-				vertex.y = voxel_origin.y + ((static_cast<float>(s_idx.y) + 0.5f) * voxel_size);
-				vertex.z = voxel_origin.z + ((static_cast<float>(s_idx.z) + 0.5f) * voxel_size);
+				vertex.x = volume_origin.x + ((static_cast<float>(s_idx.x) + 0.5f) * voxel_size);
+				vertex.y = volume_origin.y + ((static_cast<float>(s_idx.y) + 0.5f) * voxel_size);
+				vertex.z = volume_origin.z + ((static_cast<float>(s_idx.z) + 0.5f) * voxel_size);
 
 				// Convert world coordinates to camera coordinates
 				float3 cam_space = inv_extrinsic * vertex;
@@ -79,8 +79,8 @@ namespace tsdf
 			uint     height, 
 			float    *img_depth, 
 			uchar3   *img_color,
-			uint3    voxel_dim, 
-			float3   voxel_origin, 
+			uint3    volume_dim, 
+			float3   volume_origin, 
 			float    voxel_size, 
 			float    trunc_margin,
 			float    *tsdf,
@@ -88,8 +88,8 @@ namespace tsdf
 			uchar3   *color, 
 			uchar    *color_weight)
 		{
-			uint sample_count = voxel_dim.x * voxel_dim.y * voxel_dim.z;
-			const dim3 grid((sample_count + T_PER_BLOCK*T_PER_BLOCK - 1) / (T_PER_BLOCK*T_PER_BLOCK));
+			uint volume_size = volume_dim.x * volume_dim.y * volume_dim.z;
+			const dim3 grid((volume_size + T_PER_BLOCK*T_PER_BLOCK - 1) / (T_PER_BLOCK*T_PER_BLOCK));
 			const dim3 block(T_PER_BLOCK*T_PER_BLOCK);
 
 			tsdf_update_kernel <<< grid, block >>> (
@@ -99,8 +99,8 @@ namespace tsdf
 				height, 
 				img_depth, 
 				img_color, 
-				voxel_dim, 
-				voxel_origin, 
+				volume_dim, 
+				volume_origin, 
 				voxel_size, 
 				trunc_margin,
 				tsdf, 

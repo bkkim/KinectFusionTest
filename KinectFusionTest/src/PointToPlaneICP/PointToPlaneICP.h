@@ -22,8 +22,10 @@ public:
 		destroy();
 	}
 
-	float4x4 process(float4* frame_vertex, float4* frame_normal, float4* model_vertex, float4* model_normal);
-
+	float4x4 process(float4* curr_frame_vertex, 
+		             float4* curr_frame_normal, 
+		             float4* prev_model_vertex, 
+		             float4* prev_model_normal);
 
 private:
 	void create() 
@@ -38,8 +40,7 @@ private:
 		m_data.free();
 	}
 
-	float4x4 compute_icp(float4* frame_vertex, 
-						 float4x4& transform,
+	float4x4 compute_icp(float4x4& transform,
 						 LinearSystemConfidence& confidence);
 
 	float4x4 delinearize_transformation(Vector6f& x, 

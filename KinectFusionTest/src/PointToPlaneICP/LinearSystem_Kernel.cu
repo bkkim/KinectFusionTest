@@ -61,36 +61,36 @@ struct Float1x6
 };
 
 // Arguments: q moving point, n normal target
-__device__ inline  Float1x6 buildRowSystemMatrixPlane(float3 q, float3 n, float w)
+__device__ inline  Float1x6 buildRowSystemMatrixPlane(float3 s, float3 n, float w)
 {
 	Float1x6 row;
-	row.data[0] = n.x*q.y - n.y*q.x;
-	row.data[1] = n.z*q.x - n.x*q.z;
-	row.data[2] = n.y*q.z - n.z*q.y;
+	row.data[0] = n.z*s.y - n.y*s.z;
+	row.data[1] = n.x*s.z - n.z*s.x;
+	row.data[2] = n.y*s.x - n.x*s.y;
 
-	row.data[3] = -n.x;
-	row.data[4] = -n.y;
-	row.data[5] = -n.z;
+	row.data[3] = n.x;
+	row.data[4] = n.y;
+	row.data[5] = n.z;
 
 	return row;
 }
 
-// Arguments: p target point, q moving point, n normal target
-__device__ inline  float buildRowRHSPlane(float3 p, float3 q, float3 n, float w)
+// Arguments: d target point, s moving point, n normal target
+__device__ inline  float buildRowRHSPlane(float3 s, float3 d, float3 n, float w)
 {
-	return n.x*(q.x - p.x) + n.y*(q.y - p.y) + n.z*(q.z - p.z);
+	return n.x*(d.x - s.x) + n.y*(d.y - s.y) + n.z*(d.z - s.z);
 }
 
-// Arguments: p target point, q moving point, n normal target
-__device__ inline  void addToLocalSystem(float3 p, float3 q, float3 n, float weight, uint GTid)
+// Arguments: d target point, s moving point, n normal target
+__device__ inline  void addToLocalSystem(float3 s, float3 d, float3 n, float weight, uint GTid)
 {
-	const Float1x6 row = buildRowSystemMatrixPlane(q, n, weight);
-	const float b = buildRowRHSPlane(p, q, n, weight);
+	const Float1x6 row = buildRowSystemMatrixPlane(s, n, weight);
+	const float b = buildRowRHSPlane(s, d, n, weight);
 	uint linRowStart = 0;
 
-	//	#pragma unroll
+	//#pragma unroll
 	for (uint i = 0; i<6; i++) {
-		//		#pragma unroll
+		//#pragma unroll
 		for (uint j = i; j<6; j++) {
 			bucket2[ARRAY_SIZE*GTid + linRowStart + j - i] += weight*row.data[i] * row.data[j];
 		}
@@ -100,7 +100,7 @@ __device__ inline  void addToLocalSystem(float3 p, float3 q, float3 n, float wei
 		bucket2[ARRAY_SIZE*GTid + 21 + i] += weight*row.data[i] * b;
 	}
 
-	const float dN = dot(p - q, n);
+	const float dN = dot(s - d, n);
 	bucket2[ARRAY_SIZE*GTid + 27] += weight*dN*dN;		//residual
 	bucket2[ARRAY_SIZE*GTid + 28] += weight;			//corr weight
 	bucket2[ARRAY_SIZE*GTid + 29] += 1.0f;				//corr number
@@ -143,16 +143,16 @@ __global__ void scanScanElementsCS(unsigned int width,
 
 		if (index.x < width && index.y < height)
 		{
-			if (target[index1D].x != MINF && input[index1D].x != MINF && targetNormals[index1D].x != MINF) {
-				const float g_meanStDevInv = 1.0f;
-				const float3 g_mean = make_float3(0.0f, 0.0f, 0.0f);
-
-				const float3 inputT = g_meanStDevInv*((deltaTransform.getTranspose()*make_float3(input[index1D])) - g_mean);
-				const float3 targetT = g_meanStDevInv*(make_float3(target[index1D]) - g_mean);
-				const float weight = targetNormals[index1D].w;
+			if (target[index1D].x != MINF && input[index1D].x != MINF && targetNormals[index1D].x != MINF) 
+			{
+				// Referred to Kok-Lim Low's paper.
+				const float3 s = deltaTransform * make_float3(input[index1D]);
+				const float3 d = make_float3(target[index1D]);
+				const float3 n = make_float3(targetNormals[index1D]);
+				const float  w = targetNormals[index1D].w; // weight
 
 				// Compute Linearized System
-				addToLocalSystem(targetT, inputT, make_float3(targetNormals[index1D]), weight, threadIdx.x);
+				addToLocalSystem(s, d, n, w, threadIdx.x);
 			}
 		}
 	}

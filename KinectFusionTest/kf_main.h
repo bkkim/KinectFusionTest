@@ -29,13 +29,13 @@
 #define FILTER_OBJECT_MIN		0.7
 #define FILTER_OBJECT_MAX		1.5
 
-#define VOXEL_ORIGIN_X			-0.512//-1.024
-#define VOXEL_ORIGIN_Y			-0.512//-1.024
-#define VOXEL_ORIGIN_Z			0.7
+#define VOLUME_ORIGIN_X			-0.512//-1.024
+#define VOLUME_ORIGIN_Y			-0.512//-1.024
+#define VOLUME_ORIGIN_Z			0.7
 
-#define VOXEL_DIM_X				256
-#define VOXEL_DIM_Y				256
-#define VOXEL_DIM_Z				256
+#define VOLUME_DIM_X			256
+#define VOLUME_DIM_Y			256
+#define VOLUME_DIM_Z			256
 
 #define VOXEL_SIZE				0.004
 #define TRUNC_MARGIN			VOXEL_SIZE * 10

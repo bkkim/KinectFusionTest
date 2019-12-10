@@ -23,7 +23,7 @@ public:
 private:
 	void create(VolumeParam& param) 
 	{
-		uint volume_size = param.voxel_dim.x * param.voxel_dim.y * param.voxel_dim.z;
+		uint volume_size = param.volume_dim.x * param.volume_dim.y * param.volume_dim.z;
 		
 		cudaMalloc(&d_tsdf,         sizeof(float )*volume_size);
 		cudaMalloc(&d_tsdf_weight,  sizeof(float )*volume_size);
@@ -42,7 +42,7 @@ private:
 public:
 	void reset(VolumeParam& param)
 	{
-		launch_reset(param.voxel_dim, d_tsdf, d_tsdf_weight, d_color, d_color_weight);
+		launch_reset(param.volume_dim, d_tsdf, d_tsdf_weight, d_color, d_color_weight);
 	}
 
 public:

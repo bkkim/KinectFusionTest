@@ -34,10 +34,10 @@ void initializeAll()
 
 	// Set TSDFVolumeParam
 	VolumeParam volumeParam;
-	volumeParam.voxel_origin = make_float3(VOXEL_ORIGIN_X, VOXEL_ORIGIN_Y, VOXEL_ORIGIN_Z);
-	volumeParam.voxel_dim    = make_uint3(VOXEL_DIM_X, VOXEL_DIM_Y, VOXEL_DIM_Z);
-	volumeParam.voxel_size   = VOXEL_SIZE;
-	volumeParam.trunc_margin = TRUNC_MARGIN;
+	volumeParam.volume_origin = make_float3(VOLUME_ORIGIN_X, VOLUME_ORIGIN_Y, VOLUME_ORIGIN_Z);
+	volumeParam.volume_dim    = make_uint3(VOLUME_DIM_X, VOLUME_DIM_Y, VOLUME_DIM_Z);
+	volumeParam.voxel_size    = VOXEL_SIZE;
+	volumeParam.trunc_margin  = TRUNC_MARGIN;
 
 	// Create CUDATSDFMerger
 	g_CUDATSDFMerger = new CUDATSDFMerger(volumeParam, sensorParam);
@@ -90,13 +90,13 @@ int main(int argc, char* argv[])
 	cv::Mat4f mBlendNormal(h, w, CV_32FC4);
 
 	bool bFirst = true;
-	int idx_start = 80;// 900;
-	int frame_count = 320;// 600;
+	int idx_start = 900;// 80;// 900;
+	int frame_count = 600;// 320;// 600;
 
 	float4x4 current_pose;
 	current_pose.setIdentity();
 
-	std::string data_path("../Dataset/Kinect1/ubody360/source");
+	std::string data_path("../Dataset/Kinect1/ubody180/source");
 	char depth_file[MAX_PATH] = {0,};
 	char color_file[MAX_PATH] = {0,};
 
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
 
 			// vertex, model
 			cudaMemcpy(h_frame_normal, frame_normal, sizeof(float4)*w*h, cudaMemcpyDeviceToHost);
-			cudaMemcpy(h_model_normal, model_normal, sizeof(float4)*w*h, cudaMemcpyDeviceToHost);
+			cudaMemcpy(h_model_normal, model_normal, sizeof(float4)*w*h, cudaMemcpyDeviceToHost);	// Updated model normal
 			for (int v = 0; v < h; v++) {
 				for (int u = 0; u < w; u++) 
 				{

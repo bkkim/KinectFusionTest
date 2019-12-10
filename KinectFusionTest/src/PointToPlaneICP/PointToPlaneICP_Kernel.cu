@@ -1,5 +1,7 @@
 
 #include "cuda_SimpleMatrixUtil.h"
+#include "PointToPlaneICP_Params.h"
+#include "PointToPlaneICP_Data.h"
 
 #define T_PER_BLOCK		16
 
@@ -7,13 +9,23 @@
 // For correspondence check
 
 __global__ 
-void compute_correspondences(float4* _frame_vertex, float4* _frame_normal, float4* _model_vertex, float4* _model_normal,
-							 float4* _corre_vertex, float4* _corre_normal, 
-							 int _width, int _height,
-							 float _fx, float _fy, float _cx, float _cy,
-							 float _z_min, float _z_max, 
-							 float _thres_corres_dist, float _thres_corres_normal,
-							 float4x4 _delta_transform)
+void compute_correspondences(float4*  _frame_vertex, 
+	                         float4*  _frame_normal, 
+	                         float4*  _model_vertex, 
+	                         float4*  _model_normal,
+	                         float4*  _corre_vertex, 
+	                         float4*  _corre_normal, 
+	                         int      _width, 
+	                         int      _height,
+	                         float    _fx, 
+	                         float    _fy, 
+	                         float    _cx, 
+	                         float    _cy,
+	                         float    _z_min, 
+	                         float    _z_max, 
+	                         float    _thres_corres_dist, 
+	                         float    _thres_corres_normal,
+	                         float4x4 _delta_transform)
 {
 	const int x = blockIdx.x*blockDim.x + threadIdx.x;
 	const int y = blockIdx.y*blockDim.y + threadIdx.y;
@@ -59,34 +71,30 @@ void compute_correspondences(float4* _frame_vertex, float4* _frame_normal, float
 }
 
 extern "C" void
-launch_compute_correspondences(float4*  _frame_vertex, // [in] src
-							   float4*  _frame_normal, // [in] src
-							   float4*  _model_vertex, // [in] dst, target
-							   float4*  _model_normal, // [in] dst, target
-							   float4*  _corre_vertex, // [out]
-							   float4*  _corre_normal, // [out] its type is float4* for using w value.
-							   int      _width,
-							   int      _height,
-							   float    _fx,
-							   float    _fy,
-							   float    _cx,
-							   float    _cy,
-							   float    _z_min,
-							   float    _z_max,
-							   float    _thres_corres_dist,
-							   float    _thres_corres_normal,
-							   float4x4 _delta_transform)
+launch_compute_correspondences(PointToPlaneICP_Data&   icp_data,
+	                           PointToPlaneICP_Params& icp_params,
+	                           float4x4&               delta_transform)
 {
-	const dim3 gridSize((_width + T_PER_BLOCK - 1) / T_PER_BLOCK, (_height + T_PER_BLOCK - 1) / T_PER_BLOCK);
+	const dim3 gridSize((icp_params.width + T_PER_BLOCK - 1) / T_PER_BLOCK, (icp_params.height + T_PER_BLOCK - 1) / T_PER_BLOCK);
 	const dim3 blockSize(T_PER_BLOCK, T_PER_BLOCK);
 
-	compute_correspondences <<< gridSize, blockSize >>> (_frame_vertex, _frame_normal, _model_vertex, _model_normal,
-		_corre_vertex, _corre_normal,
-		_width, _height,
-		_fx, _fy, _cx, _cy,
-		_z_min, _z_max,
-		_thres_corres_dist, _thres_corres_normal,
-		_delta_transform);
+	compute_correspondences <<< gridSize, blockSize >>> (icp_data.d_frame_vertex,
+		                                                 icp_data.d_frame_normal,
+		                                                 icp_data.d_model_vertex,
+		                                                 icp_data.d_model_normal,
+		                                                 icp_data.d_corre_vertex,
+		                                                 icp_data.d_corre_normal,
+		                                                 icp_params.width,
+		                                                 icp_params.height,
+		                                                 icp_params.fx,
+		                                                 icp_params.fy,
+		                                                 icp_params.cx,
+		                                                 icp_params.cy,
+		                                                 icp_params.z_min,
+		                                                 icp_params.z_max,
+		                                                 icp_params.thres_corres_dist,
+		                                                 icp_params.thres_corres_normal,
+		                                                 delta_transform);
 #ifdef _DEBUG
 	checkCudaErrors(cudaDeviceSynchronize());
 	getLastCudaError(__FUNCTION__);

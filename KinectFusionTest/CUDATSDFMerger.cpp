@@ -6,7 +6,7 @@ CUDATSDFMerger::CUDATSDFMerger(VolumeParam volumeParam, SensorParam sensorParam)
 	: m_volumeData(NULL)
 {
 #ifdef _DEBUG
-	std::cout << "volume dimensions ( " << volumeParam.voxel_dim.x << " x " << volumeParam.voxel_dim.y << " x " << volumeParam.voxel_dim.z << " )" << std::endl;
+	std::cout << "volume dimensions ( " << volumeParam.volume_dim.x << " x " << volumeParam.volume_dim.y << " x " << volumeParam.volume_dim.z << " )" << std::endl;
 #endif
 
 	m_volumeParam = volumeParam;
@@ -33,8 +33,8 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4& current_pose)
 		m_sensorParam.height,
 		cudaSensorData->d_depth_foreground,
 		cudaSensorData->d_color,
-		m_volumeParam.voxel_dim, 
-		m_volumeParam.voxel_origin, 
+		m_volumeParam.volume_dim, 
+		m_volumeParam.volume_origin, 
 		m_volumeParam.voxel_size, 
 		m_volumeParam.trunc_margin,
 		m_volumeData->d_tsdf, 
@@ -49,8 +49,8 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4& current_pose)
 		current_pose,
 		m_sensorParam.width, 
 		m_sensorParam.height,
-		m_volumeParam.voxel_origin, 
-		m_volumeParam.voxel_dim, 
+		m_volumeParam.volume_origin, 
+		m_volumeParam.volume_dim, 
 		m_volumeParam.voxel_size, 
 		m_volumeParam.trunc_margin,
 		m_volumeData->d_tsdf, 

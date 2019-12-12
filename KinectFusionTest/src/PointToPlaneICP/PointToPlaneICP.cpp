@@ -58,9 +58,6 @@ float4x4 PointToPlaneICP::compute_icp(float4x4&               transform,
 {
 	float4x4 deltaTransform = transform;
 
-	float4 mean = make_float4(0.0f, 0.0f, 0.0f, 0.0f);
-	float meanStDev = 1.0f;
-
 	for (unsigned int i = 0; i < m_params.max_inner_iter; i++)
 	{
 		confidence.reset();
@@ -85,11 +82,13 @@ float4x4 PointToPlaneICP::compute_icp(float4x4&               transform,
 		Eigen::JacobiSVD<Matrix6x6f> SVD(ATA, Eigen::ComputeFullU | Eigen::ComputeFullV);
 		Vector6f x = SVD.solve(ATb);
 
+		//Vector6f x = ATA.colPivHouseholderQr().solve(ATb);
+
 		//computing the matrix condition
 		Vector6f evs = SVD.singularValues();
 		confidence.matrixCondition = evs[0] / evs[5];
 
-		float4x4 t = delinearize_transformation(x, Eigen::Vector3f(mean.x, mean.y, mean.z), meanStDev);
+		float4x4 t = delinearize_transformation(x);
 		if (t(0, 0) == -std::numeric_limits<float>::infinity()) {
 			confidence.trackingLostThres = true;
 			return m_mtxICPLost;
@@ -101,9 +100,7 @@ float4x4 PointToPlaneICP::compute_icp(float4x4&               transform,
 	return deltaTransform;
 }
 
-float4x4 PointToPlaneICP::delinearize_transformation(Vector6f& x, 
-													 Eigen::Vector3f& mean, 
-													 float meanStDev)
+float4x4 PointToPlaneICP::delinearize_transformation(Vector6f& x)
 {
 	Eigen::Matrix3f R = Eigen::AngleAxisf(x[2], Eigen::Vector3f::UnitZ()).toRotationMatrix()    // rotation Z (gamma)
 		              * Eigen::AngleAxisf(x[1], Eigen::Vector3f::UnitY()).toRotationMatrix()    // rotation Y (beta)
@@ -117,7 +114,7 @@ float4x4 PointToPlaneICP::delinearize_transformation(Vector6f& x,
 	Eigen::Matrix4f res;
 	res.setIdentity();
 	res.block(0, 0, 3, 3) = R;
-	res.block(0, 3, 3, 1) = meanStDev*t + mean - R*mean;
+	res.block(0, 3, 3, 1) = t;
 
 	float4x4 ret;
 	ret.setIdentity();

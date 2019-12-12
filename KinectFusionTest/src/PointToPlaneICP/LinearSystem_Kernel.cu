@@ -61,7 +61,7 @@ struct Float1x6
 };
 
 // Arguments: q moving point, n normal target
-__device__ inline  Float1x6 buildRowSystemMatrixPlane(float3 s, float3 n, float w)
+__device__ inline  Float1x6 buildRowSystemMatrix(float3 s, float3 n, float w)
 {
 	Float1x6 row;
 	row.data[0] = n.z*s.y - n.y*s.z;
@@ -76,7 +76,7 @@ __device__ inline  Float1x6 buildRowSystemMatrixPlane(float3 s, float3 n, float 
 }
 
 // Arguments: d target point, s moving point, n normal target
-__device__ inline  float buildRowRHSPlane(float3 s, float3 d, float3 n, float w)
+__device__ inline  float buildRowRHS(float3 s, float3 d, float3 n, float w)
 {
 	return n.x*(d.x - s.x) + n.y*(d.y - s.y) + n.z*(d.z - s.z);
 }
@@ -84,20 +84,20 @@ __device__ inline  float buildRowRHSPlane(float3 s, float3 d, float3 n, float w)
 // Arguments: d target point, s moving point, n normal target
 __device__ inline  void addToLocalSystem(float3 s, float3 d, float3 n, float weight, uint GTid)
 {
-	const Float1x6 row = buildRowSystemMatrixPlane(s, n, weight);
-	const float b = buildRowRHSPlane(s, d, n, weight);
+	const Float1x6 Ai = buildRowSystemMatrix(s, n, weight);
+	const float    bi = buildRowRHS(s, d, n, weight);
 	uint linRowStart = 0;
 
-	//#pragma unroll
-	for (uint i = 0; i<6; i++) {
-		//#pragma unroll
-		for (uint j = i; j<6; j++) {
-			bucket2[ARRAY_SIZE*GTid + linRowStart + j - i] += weight*row.data[i] * row.data[j];
+	for (uint i = 0; i<6; i++) 
+	{
+		for (uint j = i; j<6; j++) 
+		{
+			bucket2[ARRAY_SIZE*GTid + linRowStart + j - i] += weight*Ai.data[i] * Ai.data[j];
 		}
 
 		linRowStart += 6 - i;
 
-		bucket2[ARRAY_SIZE*GTid + 21 + i] += weight*row.data[i] * b;
+		bucket2[ARRAY_SIZE*GTid + 21 + i] += weight*Ai.data[i] * bi;
 	}
 
 	const float dN = dot(s - d, n);
@@ -156,17 +156,7 @@ __global__ void scanScanElementsCS(unsigned int width,
 			}
 		}
 	}
-
 	__syncthreads();
-
-	// Up sweep 2D
-#pragma unroll
-	for (unsigned int stride = BLOCK_SIZE / 2; stride > 32; stride >>= 1)
-	{
-		if (threadIdx.x < stride)
-			addToLocalScanElement(threadIdx.x + stride / 2, threadIdx.x, bucket2);
-		__syncthreads();
-	}
 
 	if (threadIdx.x < 32)
 		warpReduce(threadIdx.x);

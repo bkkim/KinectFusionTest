@@ -43,9 +43,7 @@ private:
 	float4x4 compute_icp(float4x4& transform,
 						 LinearSystemConfidence& confidence);
 
-	float4x4 delinearize_transformation(Vector6f& x, 
-										Eigen::Vector3f& mean, 
-										float meanStDev);
+	float4x4 delinearize_transformation(Vector6f& x);
 
 	bool check_rigid_transformation(Eigen::Matrix3f& R, 
 									Eigen::Vector3f& t, 

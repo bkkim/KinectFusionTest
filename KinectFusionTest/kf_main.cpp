@@ -100,9 +100,11 @@ int main(int argc, char* argv[])
 	char depth_file[MAX_PATH] = {0,};
 	char color_file[MAX_PATH] = {0,};
 
+	GpuTimer t_timer;
+
 	for (int idx = idx_start; idx < idx_start + frame_count; idx++)
 	{
-		std::cout << "\n Frame idx: " << std::setw(10) << std::left << idx;
+		std::cout << "Frame idx: " << std::setw(10) << std::left << idx << std::endl;
 		memset(depth_file, 0x00, sizeof(char)*MAX_PATH);
 		memset(color_file, 0x00, sizeof(char)*MAX_PATH);
 		sprintf(depth_file, "%s/depth/d_%d.png", data_path.c_str(), idx);
@@ -111,10 +113,16 @@ int main(int argc, char* argv[])
 		cv::Mat color = cv::imread(color_file);
 		cv::Mat depth = cv::imread(depth_file, cv::IMREAD_ANYDEPTH);
 
+		t_timer.Start();
 		g_CUDARGBDSensor->process((uchar3*)color.data, (ushort*)depth.data);
+		t_timer.Stop();
+		std::cout << "CUDARGBDSensor    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 
 		if (bFirst) {
+			t_timer.Start();
 			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, current_pose);
+			t_timer.Stop();
+			std::cout << "CUDATSDFMerger    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 			bFirst = false;
 		}
 		else {
@@ -124,7 +132,10 @@ int main(int argc, char* argv[])
 			float4* model_normal = g_CUDATSDFMerger->getModelData()->d_raycast_normal;
 
 			// Frame to Model transform (??) Is it model to frame motion?
+			t_timer.Start();
 			float4x4 delta_transform = g_PointToPlaneICP->process(frame_vertex, frame_normal, model_vertex, model_normal);
+			t_timer.Stop();
+			std::cout << "PointToPlaneICP   process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 			if (delta_transform(0, 0) == -std::numeric_limits<float>::infinity()) {
 				std::cout << "Fail ICP." << std::endl;
 				continue;
@@ -134,7 +145,10 @@ int main(int argc, char* argv[])
 			current_pose = current_pose * delta_transform;
 			
 			// TSDF update and raycast 
+			t_timer.Start();
 			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, current_pose);
+			t_timer.Stop();
+			std::cout << "CUDATSDFMerger    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 
 			//SaveData(frame_vertex, model_vertex, transform, param.width, param.height);
 

@@ -93,6 +93,7 @@
     <Link>
       <AdditionalDependencies>cudart.lib;opencv_world320d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Common\OpenCV3.2\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -126,6 +127,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>cudart.lib;opencv_world320.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Common\OpenCV3.2\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -140,6 +142,7 @@
     <ClInclude Include="CUDASensorData.h" />
     <ClInclude Include="CUDARGBDSensor.h" />
     <ClInclude Include="CUDATSDFMerger.h" />
+    <ClInclude Include="gpu_timer.h" />
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="VolumeData.h" />
     <ClInclude Include="cuda_SimpleMatrixUtil.h" />

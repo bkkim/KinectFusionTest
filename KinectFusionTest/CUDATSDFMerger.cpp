@@ -1,6 +1,7 @@
 
 #include "CUDATSDFMerger.h"
 #include "SensorUtil.h"
+#include "gpu_timer.h"
 
 CUDATSDFMerger::CUDATSDFMerger(VolumeParam volumeParam, SensorParam sensorParam)
 	: m_volumeData(NULL)
@@ -25,7 +26,10 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4& current_pose)
 {
 	CUDASensorData *cudaSensorData = sensor.getCUDASensorData();
 	
+	GpuTimer t_timer;
+
 	// Update TSDF
+	t_timer.Start();
 	tsdf::cuda::update(
 		m_sensorParam.intrinsic, 
 		current_pose.getInverse(),
@@ -41,9 +45,12 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4& current_pose)
 		m_volumeData->d_tsdf_weight, 
 		m_volumeData->d_color, 
 		m_volumeData->d_color_weight);
+	t_timer.Stop();
+	std::cout << " - CUDATSDFMerger  update Time: " << t_timer.Elapsed() << " ms" << std::endl;
 
 	////////////////////////////////////
 	// Make ModelData from TSDF Volume.
+	t_timer.Start();
 	tsdf::cuda::raycast(
 		m_sensorParam.intrinsic, 
 		current_pose,
@@ -59,7 +66,9 @@ void CUDATSDFMerger::process(CUDARGBDSensor& sensor, float4x4& current_pose)
 		m_modelData->d_raycast_vertex,
 		m_modelData->d_raycast_normal,
 		m_modelData->d_raycast_color);
-	
+	t_timer.Stop();
+	std::cout << " - CUDATSDFMerger raycast Time: " << t_timer.Elapsed() << " ms" << std::endl;
+
 	util::cuda::convert_depth2vertex(
 		m_modelData->d_raycast_vertex, 
 		m_modelData->d_raycast_depth, 

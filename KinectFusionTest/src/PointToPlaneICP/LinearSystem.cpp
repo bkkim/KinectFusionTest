@@ -17,15 +17,12 @@ launch_build_linear_system(unsigned int _width,
 
 LinearSystem::LinearSystem(unsigned int width, unsigned int height)
 {
-	const unsigned int localWindowSize = 12;
+	const unsigned int localWindowSize = 24;
 	const unsigned int blockSize = 64;
 	const unsigned int dimX = (unsigned int)ceil(((float)width*height) / (localWindowSize*blockSize));
 
 	checkCudaErrors(cudaMalloc(&d_output, 30 * sizeof(float)*dimX));
 	h_output = new float[30 * dimX];
-
-	//cutilSafeCall(cudaMalloc(&d_output, 30 * sizeof(float)*width*height));
-	//h_output = new float[30 * width * height];
 }
 
 LinearSystem::~LinearSystem()
@@ -47,7 +44,7 @@ void LinearSystem::apply(float4*                 src_vertex,
 						 Matrix6x7f&             res,
 						 LinearSystemConfidence& confidence)
 {
-	const unsigned int localWindowSize = 12;
+	const unsigned int localWindowSize = 24;
 	const unsigned int blockSize = 64;
 	const unsigned int dimX = (unsigned int)ceil(((float)width*height) / (localWindowSize*blockSize));
 

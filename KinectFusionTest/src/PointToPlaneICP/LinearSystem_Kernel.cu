@@ -37,7 +37,7 @@ __device__ inline void CopyToResultScanElement(uint GID, float* output)
 	//	#pragma unroll
 	for (uint i = 0; i<ARRAY_SIZE; i++)
 	{
-		output[ARRAY_SIZE*GID + i] = bucket2[0 + i];
+		output[ARRAY_SIZE*GID + i] = bucket2[i];
 	}
 }
 
@@ -158,7 +158,7 @@ __global__ void scanScanElementsCS(unsigned int width,
 	}
 	__syncthreads();
 
-	if (threadIdx.x < 32)
+	if (threadIdx.x < (BLOCK_SIZE/2))
 		warpReduce(threadIdx.x);
 
 	// Copy to output texture

@@ -3,6 +3,7 @@
 //#include <iostream>
 //#include <fstream>
 
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -12,6 +13,7 @@
 #include "CUDATSDFMerger.h"
 #include "PointToPlaneICP.h"
 #include "kf_util.h"
+#include "gpu_timer.h"
 
 #include <opencv2/opencv.hpp>
 

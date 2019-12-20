@@ -53,7 +53,7 @@ namespace tsdf
 				if (depth_val == MINF)
 					return;
 
-				float diff = (depth_val - cam_space.z);
+				float diff = (depth_val - cam_space.z) * sqrtf(1+powf((cam_space.x/cam_space.z), 2)+powf((cam_space.y/cam_space.z),2));
 				if (diff <= -trunc_margin)
 					return;
 

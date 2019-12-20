@@ -74,8 +74,65 @@ void deleteAll()
 	delete g_PointToPlaneICP; g_PointToPlaneICP = NULL;
 }
 
+
+uint g_idx = 0;
+
+void SaveData(std::ofstream& file, float4* vertex, float4* normal, float4x4 transform, uint width, uint height)
+{
+	// frame
+	float4* h_vertex = new float4[width*height];
+	float4* h_normal = new float4[width*height];
+
+	cudaMemcpy(h_vertex, vertex, sizeof(float4)*width*height, cudaMemcpyDeviceToHost);
+	cudaMemcpy(h_normal, normal, sizeof(float4)*width*height, cudaMemcpyDeviceToHost);
+
+	uint vertex_count = 0;
+	uint normal_count = 0;
+	for (int i = 0; i < width*height; i++) {
+		if (h_vertex[i].x != MINF) vertex_count++;
+		if (h_normal[i].x != MINF) normal_count++;
+	}
+
+	file << "ply" << std::endl;
+	file << "format ascii 1.0" << std::endl;
+	file << "element vertex " << vertex_count << std::endl;
+	file << "property float x" << std::endl;
+	file << "property float y" << std::endl;
+	file << "property float z" << std::endl;
+	file << "end_header" << std::endl;
+
+	// Create point cloud content for ply file
+	for (int i = 0; i < width*height; i++)
+	{
+		if (h_vertex[i].x == MINF)
+			continue;
+		file << h_vertex[i].x << " " << h_vertex[i].y << " " << h_vertex[i].z << std::endl;
+	}
+
+	SAFE_DELETE(h_vertex);
+	SAFE_DELETE(h_normal);
+
+	file.close();
+}
+
 int main(int argc, char* argv[])
 {
+//	float3 xylambda;
+//	
+//	for (int i = 0; i < INPUT_HEIGHT; i++)
+//	{
+//		for (int j = 0; j < INPUT_WIDTH; j++)
+//		{
+//			xylambda.x = ((float)j - (float)KINECT_CENTER_X) / (float)KINECT_FOCAL_X;
+//			xylambda.y = ((float)i - (float)KINECT_CENTER_Y) / (float)KINECT_FOCAL_Y;
+//			xylambda.z = 1.f;
+//			float len = length(xylambda);
+//			std::cout << "len: " << len << std::endl;
+//		}
+//		std::cout << std::endl;
+//	}
+	
+
 	// Initialize all global variables
 	initializeAll();
 
@@ -113,17 +170,20 @@ int main(int argc, char* argv[])
 		cv::Mat color = cv::imread(color_file);
 		cv::Mat depth = cv::imread(depth_file, cv::IMREAD_ANYDEPTH);
 
-		t_timer.Start();
+		//t_timer.Start();
 		g_CUDARGBDSensor->process((uchar3*)color.data, (ushort*)depth.data);
-		t_timer.Stop();
-		std::cout << "CUDARGBDSensor    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
+		//t_timer.Stop();
+		//std::cout << "CUDARGBDSensor    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 
 		if (bFirst) {
-			t_timer.Start();
+			//t_timer.Start();
 			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, current_pose);
-			t_timer.Stop();
-			std::cout << "CUDATSDFMerger    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
+			//t_timer.Stop();
+			//std::cout << "CUDATSDFMerger    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 			bFirst = false;
+
+		//	std::ofstream file("./outputs/model_0.ply");
+		//	SaveData(file, g_CUDATSDFMerger->getModelData()->d_raycast_vertex, g_CUDATSDFMerger->getModelData()->d_raycast_normal, current_pose, w, h);
 		}
 		else {
 			float4* frame_vertex = g_CUDARGBDSensor->getCUDASensorData()->d_vertex;
@@ -132,10 +192,10 @@ int main(int argc, char* argv[])
 			float4* model_normal = g_CUDATSDFMerger->getModelData()->d_raycast_normal;
 
 			// Frame to Model transform (??) Is it model to frame motion?
-			t_timer.Start();
+			//t_timer.Start();
 			float4x4 delta_transform = g_PointToPlaneICP->process(frame_vertex, frame_normal, model_vertex, model_normal);
-			t_timer.Stop();
-			std::cout << "PointToPlaneICP   process Time: " << t_timer.Elapsed() << " ms" << std::endl;
+			//t_timer.Stop();
+			//std::cout << "PointToPlaneICP   process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 			if (delta_transform(0, 0) == -std::numeric_limits<float>::infinity()) {
 				std::cout << "Fail ICP." << std::endl;
 				continue;
@@ -145,12 +205,13 @@ int main(int argc, char* argv[])
 			current_pose = current_pose * delta_transform;
 			
 			// TSDF update and raycast 
-			t_timer.Start();
+			//t_timer.Start();
 			g_CUDATSDFMerger->process(*g_CUDARGBDSensor, current_pose);
-			t_timer.Stop();
-			std::cout << "CUDATSDFMerger    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
+			//t_timer.Stop();
+			//std::cout << "CUDATSDFMerger    process Time: " << t_timer.Elapsed() << " ms" << std::endl;
 
-			//SaveData(frame_vertex, model_vertex, transform, param.width, param.height);
+		//	std::ofstream file("./outputs/model_0.ply");
+		//	SaveData(file, model_vertex, model_normal, current_pose, w, h);
 
 			// vertex, model
 			cudaMemcpy(h_frame_normal, frame_normal, sizeof(float4)*w*h, cudaMemcpyDeviceToHost);

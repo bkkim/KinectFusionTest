@@ -19,6 +19,9 @@
     <Filter Include="TSDFMerge\Model">
       <UniqueIdentifier>{7a7bb11f-a0a4-495e-8e6a-fb864bbb2d15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TSDFMarchingCube">
+      <UniqueIdentifier>{746dc366-c96e-44b4-ad4e-34fa6939f220}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kf_main.h" />
@@ -87,6 +90,15 @@
       <Filter>Sensor</Filter>
     </ClInclude>
     <ClInclude Include="gpu_timer.h" />
+    <ClInclude Include="CUDATSDFMarchingCube.h">
+      <Filter>TSDFMarchingCube</Filter>
+    </ClInclude>
+    <ClInclude Include="defines.h">
+      <Filter>TSDFMarchingCube</Filter>
+    </ClInclude>
+    <ClInclude Include="tables.h">
+      <Filter>TSDFMarchingCube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CUDARGBDSensor.cpp">
@@ -105,6 +117,9 @@
       <Filter>PointToPlaneICP</Filter>
     </ClCompile>
     <ClCompile Include="kf_main.cpp" />
+    <ClCompile Include="CUDATSDFMarchingCube.cpp">
+      <Filter>TSDFMarchingCube</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="SensorUtil.cu">
@@ -124,6 +139,9 @@
     </CudaCompile>
     <CudaCompile Include="VolumeDataUtil.cu">
       <Filter>TSDFMerge\Volume</Filter>
+    </CudaCompile>
+    <CudaCompile Include="tsdf_marchingCube_kernel.cu">
+      <Filter>TSDFMarchingCube</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

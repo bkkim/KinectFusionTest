@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CUDARGBDSensor.cpp" />
+    <ClCompile Include="CUDATSDFMarchingCube.cpp" />
     <ClCompile Include="CUDATSDFMerger.cpp" />
     <ClCompile Include="kf_main.cpp" />
     <ClCompile Include="RGBDSensor.cpp" />
@@ -149,9 +150,12 @@
   <ItemGroup>
     <ClInclude Include="CUDASensorData.h" />
     <ClInclude Include="CUDARGBDSensor.h" />
+    <ClInclude Include="CUDATSDFMarchingCube.h" />
     <ClInclude Include="CUDATSDFMerger.h" />
+    <ClInclude Include="defines.h" />
     <ClInclude Include="gpu_timer.h" />
     <ClInclude Include="ModelData.h" />
+    <ClInclude Include="tables.h" />
     <ClInclude Include="VolumeData.h" />
     <ClInclude Include="cuda_SimpleMatrixUtil.h" />
     <ClInclude Include="cuda_Util.h" />
@@ -173,6 +177,7 @@
     <ClInclude Include="VolumeParam.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="tsdf_marchingCube_kernel.cu" />
     <CudaCompile Include="VolumeDataUtil.cu" />
     <CudaCompile Include="SensorUtil.cu" />
     <CudaCompile Include="src\PointToPlaneICP\LinearSystem_Kernel.cu" />

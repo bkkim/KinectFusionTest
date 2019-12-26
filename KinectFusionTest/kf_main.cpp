@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
 			cv::imshow("frame normal", mFrameNormal);
 			cv::imshow("model normal", mModelNormal);
 			cv::imshow("blend normal", mBlendNormal);
-			cv::waitKey(1);
+			cv::waitKey(0);
 		}
 	}
 

@@ -4,6 +4,7 @@
 CUDARGBDSensor       *g_CUDARGBDSensor  = NULL;
 CUDATSDFMerger       *g_CUDATSDFMerger  = NULL;
 PointToPlaneICP      *g_PointToPlaneICP = NULL;
+CUDATSDFMarchingCube *g_CUDATSDFMarchingCube = NULL;
 
 void initializeAll()
 {
@@ -42,6 +43,10 @@ void initializeAll()
 	// Create CUDATSDFMerger
 	g_CUDATSDFMerger = new CUDATSDFMerger(volumeParam, sensorParam);
 	g_CUDATSDFMerger->getVolumeData()->reset(volumeParam);
+
+	// Create CUDATSDFMarchingCube
+	g_CUDATSDFMarchingCube = new CUDATSDFMarchingCube();
+	g_CUDATSDFMarchingCube->create(volumeParam.volume_dim, volumeParam.volume_origin, volumeParam.voxel_size, 0.0f);
 
 	//
 	PointToPlaneICP_Params icpParam;
@@ -267,9 +272,13 @@ int main(int argc, char* argv[])
 			cv::imshow("frame normal", mFrameNormal);
 			cv::imshow("model normal", mModelNormal);
 			cv::imshow("blend normal", mBlendNormal);
-			cv::waitKey(0);
+			cv::waitKey(1);
 		}
 	}
+
+	// Marching Cube
+	g_CUDATSDFMarchingCube->process(*g_CUDATSDFMerger);
+
 
 	///
 	deleteAll();

@@ -11,6 +11,7 @@
 #include "cuda_SimpleMatrixUtil.h"
 #include "CUDARGBDSensor.h"
 #include "CUDATSDFMerger.h"
+#include "CUDATSDFMarchingCube.h"
 #include "PointToPlaneICP.h"
 #include "kf_util.h"
 #include "gpu_timer.h"
